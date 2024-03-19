@@ -4,13 +4,14 @@ from PyQt5.QtGui import QPixmap, QPainter, QPen, QColor
 from PIL import Image
 import easyocr
 from googletrans import Translator
-import sys, configparser
+import configparser
+import sys
 
 class LanguageSelectionWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle('Language Selection')
-        self.setWindowOpacity(0.3)  # Set window opacity to 30%
+        self.setWindowOpacity(0.3)  # Set window opacity to 80%
         self.setMinimumWidth(300)   # Set minimum width to prevent widgets from being compressed
 
         self.settings_file = 'settings.ini'
@@ -57,74 +58,43 @@ class LanguageSelectionWidget(QWidget):
         self.reader = easyocr.Reader(['en'], gpu=True)
         self.translator = Translator()
 
-        # Add button for selecting area to screenshot
-        self.area_button = QPushButton('Area', self)
-        self.area_button.clicked.connect(self.select_area)
-
         # Add button to start OCR and translation
         self.start_button = QPushButton('Start', self)
         self.start_button.clicked.connect(self.start_translation)
-        self.start_button.setEnabled(False)
+        self.start_button.setEnabled(True)  
 
-        self.area_selected = False
-        self.area_start = None
-        self.area_end = None
-
-    def select_area(self):
-        self.area_selected = False
-        self.area_start = None
-        self.area_end = None
-        QMessageBox.information(self, 'Select Area', 'Click and drag to select an area for the screenshot.')
-
-    def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            self.area_start = event.pos()
-
-    def mouseMoveEvent(self, event):
-        if self.area_start is not None:
-            self.area_end = event.pos()
-            self.update()
-
-    def mouseReleaseEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            self.area_end = event.pos()
-            self.area_selected = True
-            self.update()
-            self.start_button.setEnabled(True)
-
-    def paintEvent(self, event):
-        if self.area_start is not None and self.area_end is not None:
-            painter = QPainter(self)
-            painter.setPen(QPen(QColor(255, 0, 0, 128), 3))
-            painter.drawRect(QRect(self.area_start, self.area_end))
+        # Add start button below language selection
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(self.start_button)
+        layout.addLayout(button_layout)
 
     def start_translation(self):
-        self.grab_and_translate_area()
-        self.start_button.setEnabled(False)
+        # Read the screenshot area coordinates from the settings file
+        settings = configparser.ConfigParser()
+        settings.read('settings.ini')
+        x1 = settings.getint('Window', 'x')
+        y1 = settings.getint('Window', 'y')+110
+        x2 = settings.getint('Window', 'width') + x1
+        y2 = settings.getint('Window', 'height') + y1
 
-    def grab_and_translate_area(self):
-        if self.area_selected:
-            # Get the selected area
-            rect = QRect(self.area_start, self.area_end).normalized()
-            screenshot = QApplication.primaryScreen().grabWindow(QApplication.desktop().winId(), rect.x(), rect.y(), rect.width(), rect.height())
-            screenshot.save('screenshot.png', 'png')
+        # Read the screenshot of the selected area
+        screenshot = QApplication.primaryScreen().grabWindow(QApplication.desktop().winId(), x1, y1, x2 - x1, y2 - y1)
+        screenshot.save('screenshot.png', 'png')
 
-            # Perform OCR
-            image = Image.open('screenshot.png')
-            text = self.reader.readtext('screenshot.png')
-            if text:
-                # Translate the text
-                translation = self.translator.translate(text, src='en', dest='fr')
-                print(f'Original Text: {text}')
-                print(f'Translation: {translation.text}')
+        # Perform OCR
+        image = Image.open('screenshot.png')
+        text_list = self.reader.readtext('screenshot.png')
+
+        # Combine all text into one paragraph
+        paragraph = ' '.join([text_info[1] for text_info in text_list])
+
+        # Translate the combined text
+        translation = self.translator.translate(paragraph, src='es', dest='en')
+        print(f'Original Text: {paragraph}')
+        print(f'Translation: {translation.text}')
 
     def update_screenshot(self):
-        # Update the screenshot label with the selected area
-        if self.area_selected:
-            rect = QRect(self.area_start, self.area_end).normalized()
-            screenshot = QApplication.primaryScreen().grabWindow(QApplication.desktop().winId(), rect.x(), rect.y(), rect.width(), rect.height())
-            pixmap = QPixmap(screenshot)
-            self.screenshot_label.setPixmap(pixmap.scaled(self.screenshot_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+        pass  # This method will be called every second to update the screenshot label
 
     def load_languages(self):
         config = configparser.ConfigParser()
