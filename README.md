@@ -1,1 +1,1 @@
-# OCR-Translator
+# Snip-Translator
