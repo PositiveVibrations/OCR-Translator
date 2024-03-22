@@ -8,7 +8,8 @@ import pyautogui
 import configparser
 import sys
 import os
-
+import time
+from collections import defaultdict
 
 class LanguageSelectionWidget(QWidget):
     def __init__(self):
@@ -21,9 +22,10 @@ class LanguageSelectionWidget(QWidget):
 
         # Load default and translated languages from file
         self.default_language, self.translated_language = self.load_languages()
+        
 
-        from_label = QLabel('From:')
-        to_label = QLabel('To:')
+        from_label = QLabel('You:')
+        to_label = QLabel('Them:')
         self.original_text_edit = QTextEdit(self)
         self.original_text_edit.setGeometry(0, 400, 800, 200)
         self.original_text_edit.setReadOnly(True)  # Make it read-only
@@ -32,15 +34,16 @@ class LanguageSelectionWidget(QWidget):
         self.original_text_edit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)  # Hide horizontal scrollbar
 
         self.translated_text_edit = QTextEdit(self)
-        self.translated_text_edit.setGeometry(0, 600, 800, 200)
+        self.translated_text_edit.setGeometry(0, 600, 900, 200)
         self.translated_text_edit.setReadOnly(True)
         self.translated_text_edit.setLineWrapMode(QTextEdit.WidgetWidth)
         self.translated_text_edit.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.translated_text_edit.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        # Get a list of all language codes and names
+        # Get a list of all language codes with Capital first letter and names
         language_codes = list(LANGUAGES.keys())
-        language_names = list(LANGUAGES.values())
+        language_names = [LANGUAGES[code].capitalize() for code in language_codes]
+       
 
         self.default_combo = QComboBox()
         self.default_combo.addItems(language_names)
@@ -53,7 +56,7 @@ class LanguageSelectionWidget(QWidget):
         self.translated_combo.currentIndexChanged.connect(self.update_translated_language)
 
         # Initialize snipping widget
-        self.snipping_widget = SnippingWidget(self.default_language, self.translated_language)
+        self.snipping_widget = SnippingWidget(self.default_language, self.translated_language, self)
 
         layout = QHBoxLayout()  # Create layout here
         layout.addWidget(from_label)
@@ -71,7 +74,7 @@ class LanguageSelectionWidget(QWidget):
 
         # Create a label for displaying the snipped image
         self.screenshot_label = QLabel(self)
-        self.screenshot_label.setGeometry(0, 100, 800, 600)
+        self.screenshot_label.setGeometry(0, 100, 600, 600)
         self.update_screenshot()  # Load initial image
         
 
@@ -79,9 +82,6 @@ class LanguageSelectionWidget(QWidget):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_screenshot)
         #self.timer.timeout.connect(self.start_translation)
-
-        
-       
 
         self.timer.start(1000)  # Update every second
 
@@ -110,10 +110,25 @@ class LanguageSelectionWidget(QWidget):
         layout.addLayout(button_layout)
 
         # Initialize snipping widget
-        self.snipping_widget = SnippingWidget(self.default_language, self.translated_language)
+        self.snipping_widget = SnippingWidget(self.default_language, self.translated_language, self)
 
         self.snipping_widget.hide()
 
+    #language detection function
+    def detect_language(self, text):
+        language=self.translator.detect(text).lang
+        #convert key to value as capital
+        language = LANGUAGES[language].capitalize()
+        if language == None:
+            #return the one from settings
+            settings = configparser.ConfigParser()
+            settings.read('settings.ini')
+            translated_language = settings.get('Settings', 'translated_language', fallback='English')
+            return translated_language
+        return language
+
+
+    
     def take_screenshot(self, start_x, start_y, end_x, end_y):
         settings = configparser.ConfigParser()
         settings.read('settings.ini')
@@ -134,6 +149,12 @@ class LanguageSelectionWidget(QWidget):
 
         # Show the snipping widget
         self.snipping_widget.show()
+        
+
+        #start translation
+        
+        #update the
+        
 
     def start_translation(self):
         # Read the screenshot area coordinates from the settings file
@@ -144,16 +165,12 @@ class LanguageSelectionWidget(QWidget):
         x2 = settings.getint('Snip', 'x2')
         y2 = settings.getint('Snip', 'y2')
         
-        settings = configparser.ConfigParser()
-        settings.read('settings.ini')
-        x1 = settings.getint('Snip', 'x1')
-        y1 = settings.getint('Snip', 'y1')
-        x2 = settings.getint('Snip', 'x2')
-        y2 = settings.getint('Snip', 'y2')
-        #read in default language
+
         default_language = self.default_combo.currentText()
         #read in translated language
         translated_language = self.translated_combo.currentText()
+        #detect the language of the text
+        
 
         # Read the screenshot of the selected area
         screenshot = QApplication.primaryScreen().grabWindow(QApplication.desktop().winId(), x1, y1, x2 - x1, y2 - y1)
@@ -163,9 +180,28 @@ class LanguageSelectionWidget(QWidget):
         image = Image.open('snip.png')
         text_list = self.reader.readtext('snip.png')
 
-        # Combine all text into one paragraph
-        paragraph = ' '.join([text_info[1] for text_info in text_list])
+        text_dict = defaultdict(list)
+        for text_info in text_list:
+            y_coordinate = text_info[0][1]  # Assuming the y-coordinate is at index 1
+            if isinstance(y_coordinate, list):
+                y_coordinate = y_coordinate[0]  # Use the first value if y_coordinate is a list
+            text = text_info[1]
+            text_dict[y_coordinate].append(text)
 
+        # Combine text on the same line into a single string
+        paragraph = [' '.join(text_dict[key]) for key in sorted(text_dict.keys())]
+
+        # Combine all lines into a single string, with each line separated by a newline
+        paragraph = '\n'.join(paragraph)
+        
+        detected_language = self.detect_language(paragraph)
+        print(f'Detected language: {detected_language}')
+        if detected_language != translated_language:
+            #update settings and selected language
+            self.translated_combo.setCurrentText(detected_language)
+            self.save_languages()
+            translated_language = detected_language
+            # Translate the text to the default language
         # Translate the combined text
         translation = self.translator.translate(paragraph, src=translated_language, dest=default_language)
         original_text = paragraph
@@ -173,24 +209,59 @@ class LanguageSelectionWidget(QWidget):
         self.original_text_edit.setPlainText(f'Original Text: {original_text}')
         self.translated_text_edit.setPlainText(f'Translated Text: {translated_text}')
 
+
     def update_screenshot(self):
-        
         screenshot_path = 'snip.png'
         if os.path.exists(screenshot_path):
             pixmap = QPixmap(screenshot_path)
             self.screenshot_label.setPixmap(pixmap)
             self.screenshot_label.adjustSize()
             self.screenshot_label.show()
+
+            # Set default positions for the widgets
+            default_x = (self.width() - pixmap.width()) // 2
+            default_y = 100
+            default_width = max(pixmap.width(), 0)
+            default_original_text_y = pixmap.height() + 110
+            default_translated_text_y = pixmap.height() + 320
+            default_chat_bar_y = self.height() - 120 if hasattr(self, 'chat_bar') else 0
+
             # Resize the window to fit the screenshot and double the height for the text but set a minimal width to like 400
-            self.resize(max(pixmap.width(), 900), pixmap.height() + 600)
+            min_width = 800
+            self.resize(max(pixmap.width(), min_width), pixmap.height() + 670)
+
+            # Calculate the center position relative to the current window size
+            center_x = max((self.width() - pixmap.width()) // 2, 0)
+
+            # Calculate the text box width based on the window width
+            text_box_width = min(self.width(), default_width)
+
+            # Calculate the text box position to ensure it stays within the window bounds
+            text_box_x = max(center_x, 0)
 
             # Align the image to the top of the window but 100 down to make space for the text
-            self.screenshot_label.setGeometry(0, 100, pixmap.width(), pixmap.height())
-            #resize the text box to fit the window BUT MIN IS 800
+            self.screenshot_label.setGeometry(center_x, default_y, pixmap.width(), pixmap.height())
 
-            self.original_text_edit.setGeometry(0, pixmap.height() + 100, max(pixmap.width(), 800), 200)
-            self.translated_text_edit.setGeometry(0, pixmap.height() + 300, max(pixmap.width(), 800), 200)
-            
+            # Align the text boxes to the left if the screenshot is smaller than the default width
+            if pixmap.width() < default_width:
+                text_box_x = 0
+
+            # Resize the text box to fit the window
+            self.original_text_edit.setGeometry(text_box_x, default_original_text_y, text_box_width, 200)
+            self.translated_text_edit.setGeometry(text_box_x, default_translated_text_y, text_box_width, 200)
+
+            # Update the scroll bar to the bottom if the text is too long
+            self.original_text_edit.verticalScrollBar().setValue(self.original_text_edit.verticalScrollBar().maximum())
+            self.translated_text_edit.verticalScrollBar().setValue(self.translated_text_edit.verticalScrollBar().maximum())
+
+            # Update chat bar if it exists
+            if hasattr(self, 'chat_bar'):
+                self.chat_bar.setGeometry(text_box_x, default_chat_bar_y, text_box_width, 100)
+                self.chat_bar.textChanged.connect(self.handle_text_changed)
+        
+
+
+
 
             
 
@@ -346,16 +417,20 @@ class LanguageSelectionWidget(QWidget):
             }
             with open('settings.ini', 'w') as configfile:
                 settings.write(configfile)
+                time.sleep(.3)
             break
 
 
 
 
         if not hasattr(self, 'chat_bar'):
+            #set the bar at the very bottom of the screen by determining the height of the screen
+
             self.chat_bar = QTextEdit(self)
-            self.chat_bar.setGeometry(0, self.height() - 200, self.width(), 200)
+            self.chat_bar.setGeometry(0, self.height() - 100, self.width(), 100)
             self.chat_bar.setPlaceholderText('Type your message here...')
             self.chat_bar.show()
+            self.chat_bar.setStyleSheet('border-radius: 10px;')
             self.chat_bar.textChanged.connect(self.handle_text_changed)
 
     def handle_text_changed(self):
@@ -394,8 +469,9 @@ class LanguageSelectionWidget(QWidget):
 
 
 class SnippingWidget(QWidget):
-    def __init__(self, default_language, translated_language):
+    def __init__(self, default_language, translated_language, language_widget):
         super().__init__()
+        
         self.default_language = default_language
         self.translated_language = translated_language
         self.setWindowTitle('Snipping Tool')
@@ -413,6 +489,12 @@ class SnippingWidget(QWidget):
         self.label.setStyleSheet('font-size: 24px; color: white;')
 
         self.showFullScreen()
+        
+        
+       
+        self.language_widget = language_widget  # Use the passed instance
+
+        # Your other code...
 
     def paintEvent(self, event):
         if self.begin is None or self.end is None:
@@ -438,6 +520,9 @@ class SnippingWidget(QWidget):
             self.end = event.pos()
             self.close()
             self.capture_snip()
+            self.language_widget.start_translation()
+            
+            
 
 
 
@@ -503,6 +588,10 @@ class SnippingWidget(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
+    app.setWindowIcon(QIcon('icons/snip-translation-icon.ico'))
+
     widget = LanguageSelectionWidget()
+    widget.setStyleSheet(open('style.css').read())  # Apply stylesheet to the widget
     widget.show()
+
     sys.exit(app.exec_())

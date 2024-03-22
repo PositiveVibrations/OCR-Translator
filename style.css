@@ -1,0 +1,43 @@
+/* styles.css */
+QWidget {
+    background-color: #3c374b; /* Dark blue */
+    color: #00ff00; /* Green text */
+}
+
+/* Set the text color for QLabel, QTextEdit, and QPushButton */
+QLabel, QTextEdit, QPushButton {
+    color: #000; /* Black text */
+}
+
+/* Set the background color for QTextEdit */
+QTextEdit {
+    background-color: #fff; /* White */
+}
+
+/* Set the background color and styles for QPushButton */
+QPushButton {
+    background-color: #4caf50; /* Green */
+    color: white; /* White text color */
+    border-radius: 5px; /* Rounded corners */
+    padding: 5px 10px; /* Padding around text */
+}
+
+/* Set the hover background color for QPushButton */
+QPushButton:hover {
+    background-color: #388e3c; /* Darker green on hover */
+}
+
+/* Set the background color for QComboBox */
+QComboBox {
+    background-color: #fff; /* White */
+    color: #000; /* Black text */
+    border-radius: 5px; /* Rounded edges */
+}
+
+/* Make the "You" and "Them" text light and modern */
+#youLabel, #themLabel {
+    color: #00ff00; /* Green text */
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
