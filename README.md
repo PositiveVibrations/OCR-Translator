@@ -1,6 +1,7 @@
 # Snip Translator
 
 The Snip Translator is a PyQt5 application that allows users to translate text from screenshots in real-time. It includes features like language detection, translation, and chat functionality using PyAutoGUI.
+Useful to chat on any platform, website, anything from your computer.
 
 ## Overview
 
@@ -15,7 +16,7 @@ Watch a demo of the Snip Translator in action [here](https://www.youtube.com/wat
 - **Real-Time Translation:** Translate text from screenshots instantly.
 - **Language Detection:** Automatically detect the language of the text.
 - **Customizable Language Preferences:** Set your default and translated languages.
-- **Chat Functionality:** Type and translate messages in the chat bar.
+- **Chat Functionality:** Click Chat (The next place you click will be stored to settings as to where to send your translated messages" Type and translate messages in the chat bar and press enter.
 
 ## Getting Started
 
