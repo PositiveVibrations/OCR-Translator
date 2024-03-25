@@ -52,7 +52,7 @@ We would like to thank the developers of PyQt5, EasyOCR, Google Translate, and P
 
 ## Contact Us
 
-For inquiries, suggestions, or collaborations, please contact us.
+For inquiries, suggestions, or collaborations, please contact.
 
 ## Current Version
 
