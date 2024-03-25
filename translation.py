@@ -463,6 +463,21 @@ class LanguageSelectionWidget(QWidget):
         pyautogui.typewrite(message, interval=0.1)
         pyautogui.press('enter')
 
+        #click the bottom of the application to bring the chat bar back
+        #[Window]
+        #x=0
+        #y=0
+        #width=800
+        #height=800
+        x = settings.getint('Window', 'x')
+        y = settings.getint('Window', 'y')
+        width = settings.getint('Window', 'width')
+        height = settings.getint('Window', 'height')
+        #click the bottom where the chat bar is
+        pyautogui.click(x + width // 2, y + height - 50)
+
+
+
 
 
 
