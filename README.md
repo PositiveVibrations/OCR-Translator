@@ -20,10 +20,11 @@ Watch a quick demo of the Snip Translator in action:
 - **Chat Functionality:** Type and translate messages in the chat bar.
 
 ## Getting Started
-
+Python 3.12.1
 1. Clone the repository or download the ZIP file.
 2. Install the required Python packages using `pip install -r doc/requirements.txt`.
 3. Launch the application using `python translation.py`.
+
 
 ## Usage Instructions
 
