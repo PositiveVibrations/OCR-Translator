@@ -8,7 +8,7 @@ The Snip Translator is a powerful tool that enables users to translate text from
 
 ## Demo
 
-Watch a demo of the Snip Translator in action [here](https://www.youtube.com/watch?v=your_demo_video_id).
+Watch a quick demo of the Snip Translator in action ![Demo Snip](https://path_to_your_demo_snip.gif)
 
 ## Key Features
 
@@ -48,7 +48,7 @@ We would like to thank the developers of PyQt5, EasyOCR, Google Translate, and P
 
 ## Contact Us
 
-For inquiries, suggestions, or collaborations, please contact us at email@example.com.
+For inquiries, suggestions, or collaborations, please contact us.
 
 ## Current Version
 
