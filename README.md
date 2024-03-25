@@ -8,7 +8,9 @@ The Snip Translator is a powerful tool that enables users to translate text from
 
 ## Demo
 
-Watch a quick demo of the Snip Translator in action ![Demo Snip](**https://github.com/PositiveVibrations/Snip-Translator/Demo-Snip.gif*)
+Watch a quick demo of the Snip Translator in action:
+
+![Demo Snip](doc/Demo-Snip.gif)
 
 ## Key Features
 
@@ -20,8 +22,8 @@ Watch a quick demo of the Snip Translator in action ![Demo Snip](**https://githu
 ## Getting Started
 
 1. Clone the repository or download the ZIP file.
-2. Install the required Python packages using `pip install -r requirements.txt`.
-3. Launch the application using `python main.py`.
+2. Install the required Python packages using `pip install -r doc/requirements.txt`.
+3. Launch the application using `python translation.py`.
 
 ## Usage Instructions
 
