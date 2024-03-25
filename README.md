@@ -30,8 +30,9 @@ Python 3.12.1
 
 - **Set Default and Translated Languages:** Choose your default and translated languages using the dropdown menus.
 - **Snip Area:** Click and drag to select the area of the screen you want to translate.
-- **Start Translation:** Click the "Start" button to begin the OCR and translation process.
+- **Start Translation:** Click the "Live" button to update OCR and translation process.
 - **Chat Translation:** Click the "Chat" button to enable chat mode and translate your messages.
+ (Ex Usage: After clicking "Chat", click the chatbox on Whatsapp, Skype, Discord, all messages will be translated and sent there in the future)
 
 ## Community and Contributions
 
