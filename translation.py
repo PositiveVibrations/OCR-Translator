@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QTextEdit, QApplication, QWidget, QLabel, QComboBox, QHBoxLayout, QVBoxLayout, QPushButton
 from PyQt5.QtCore import Qt, QTimer, QPoint, QRect
+from PyQt5 import QtCore
 from PyQt5.QtGui import QPixmap, QPainter, QPen, QGuiApplication, QIcon
 from PIL import Image
 import easyocr
@@ -90,12 +91,12 @@ class LanguageSelectionWidget(QWidget):
         self.translator = Translator()
 
         # Add button to start OCR and translation
-        self.start_button = QPushButton('Start', self)
+        self.start_button = QPushButton('Live', self)
         self.start_button.clicked.connect(self.start_translation)
         self.start_button.setEnabled(True)  
 
         # Add button to snip area
-        self.snip_button = QPushButton('Snip Area', self)
+        self.snip_button = QPushButton('Snip', self)
         self.snip_button.clicked.connect(self.snip_area)
 
         # Add Chat button
@@ -592,6 +593,10 @@ if __name__ == '__main__':
 
     widget = LanguageSelectionWidget()
     widget.setStyleSheet(open('style.css').read())  # Apply stylesheet to the widget
+
+    # Set the widget to always be on top
+    widget.setWindowFlags(widget.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
+
     widget.show()
 
     sys.exit(app.exec_())
