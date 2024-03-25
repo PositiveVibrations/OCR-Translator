@@ -8,7 +8,7 @@ The Snip Translator is a powerful tool that enables users to translate text from
 
 ## Demo
 
-Watch a quick demo of the Snip Translator in action ![Demo Snip](https://path_to_your_demo_snip.gif)
+Watch a quick demo of the Snip Translator in action ![Demo Snip](**https://github.com/PositiveVibrations/Snip-Translator/Demo-Snip.gif*)
 
 ## Key Features
 
