@@ -20,17 +20,19 @@ Watch a quick demo of the Snip Translator in action:
 - **Chat Functionality:** Type and translate messages in the chat bar.
 
 ## Getting Started
-
+Python 3.12.1
 1. Clone the repository or download the ZIP file.
 2. Install the required Python packages using `pip install -r doc/requirements.txt`.
 3. Launch the application using `python translation.py`.
+
 
 ## Usage Instructions
 
 - **Set Default and Translated Languages:** Choose your default and translated languages using the dropdown menus.
 - **Snip Area:** Click and drag to select the area of the screen you want to translate.
-- **Start Translation:** Click the "Start" button to begin the OCR and translation process.
+- **Start Translation:** Click the "Live" button to update OCR and translation process.
 - **Chat Translation:** Click the "Chat" button to enable chat mode and translate your messages.
+ (Ex Usage: After clicking "Chat", click the chatbox on Whatsapp, Skype, Discord, all messages will be translated and sent there in the future)
 
 ## Community and Contributions
 
