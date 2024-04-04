@@ -484,7 +484,7 @@ class LanguageSelectionWidget(QWidget):
 
 
 
-#Class for handling translation
+#Class for snipping
 
 class SnippingWidget(QWidget):
     def __init__(self, default_language, translated_language, language_widget):
