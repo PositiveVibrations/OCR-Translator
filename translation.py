@@ -12,6 +12,8 @@ import os
 import time
 from collections import defaultdict
 
+
+#class for our user interface and functionality within
 class LanguageSelectionWidget(QWidget):
     def __init__(self):
         super().__init__()
@@ -482,7 +484,7 @@ class LanguageSelectionWidget(QWidget):
 
 
 
-
+#Class for handling translation
 
 class SnippingWidget(QWidget):
     def __init__(self, default_language, translated_language, language_widget):
@@ -505,12 +507,8 @@ class SnippingWidget(QWidget):
         self.label.setStyleSheet('font-size: 24px; color: white;')
 
         self.showFullScreen()
-        
-        
        
         self.language_widget = language_widget  # Use the passed instance
-
-        # Your other code...
 
     def paintEvent(self, event):
         if self.begin is None or self.end is None:
@@ -537,10 +535,6 @@ class SnippingWidget(QWidget):
             self.close()
             self.capture_snip()
             self.language_widget.start_translation()
-            
-            
-
-
 
     def capture_snip(self):
         x1 = min(self.begin.x(), self.end.x())
@@ -599,8 +593,6 @@ class SnippingWidget(QWidget):
             settings = config['Settings']
             self.default_language = settings.get('default_language', 'English')
             self.translated_language = settings.get('translated_language', 'English')
-
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
